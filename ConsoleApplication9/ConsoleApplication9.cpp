@@ -16,16 +16,28 @@ void modTab(Table pTab, int newSize) {
 }
 
 int main() {
+	Table table1("table1",5), table2("table2",5);
+	table1.setNewArraySize(6);
+	table2.setNewArraySize(4);
+	table1 = table2;
+	table2.fillArray(5);
+	table1.printArray();
+	table2.printArray();
+	/*Table table1("table1",5), table2("table2",5);
+	table1.fillArray(7);
+	table2.fillArray(1);
+	Table table3 = table1 + table2;
+	table3.printArray();
 	Table* table = new Table();
 	Table* table2 = new Table(*table);
 	Table* table3 = new Table("created", 10);
 	Table* table4 = (*table).clone();
-	(*table).fillArray();
-	(*table4).fillArray();
+	(*table).fillArray(0);
+	(*table4).fillArray(0);
 	modTab(table, 4);
-	(*table).fillArray();
+	(*table).fillArray(0);
 	modTab(table4, 6);
-	(*table4).fillArray();
+	(*table4).fillArray(0);
 	modTab(*table2, 6);
 	(*table).printArray();
 	(*table4).printArray();
@@ -46,8 +58,8 @@ int main() {
 		delete array[i];
 	}
 	delete [] array;
-	cout << " test";
-	//Table* array = new Table[3];
+	cout << " test";*/
+	//Table* array = new Table[3];*/
 	//de
 
 }

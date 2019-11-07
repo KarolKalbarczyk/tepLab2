@@ -20,7 +20,9 @@ public:
 	~Table();
 	int getArraySize();
 	void printArray();
-	void fillArray();
+	void fillArray(int toAdd);
+	Table operator+(Table &table);
+	void operator=(Table &table);
 
 private:
 	int* copyArray(int* arrayToCopy, int size);
@@ -28,6 +30,7 @@ private:
 	std::string name;
 	int* array;
 	int arraySize;
+	int* concat(int* array, int arraySize);
 };
 
 #endif

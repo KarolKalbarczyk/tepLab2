@@ -63,16 +63,45 @@ void Table::printArray() {
 	}
 }
 
-void Table::fillArray() {
+void Table::fillArray(int toAdd) {
 	for (int i = 0; i < this->arraySize; i++)
 	{
-		this->array[i] = i;
+		this->array[i] = i+toAdd;
 	}
 }
 
 Table* Table::clone() {
 	Table* clone = new Table(*this);
 	return clone;
+}
+
+int* Table::concat(int* otherArray, int otherArraySize) {
+	int size = this->arraySize + otherArraySize;
+	int* newArray = new int[size];
+	for (size_t i = 0; i < this->arraySize; i++)
+	{
+		newArray[i] = (this->array)[i];
+	}
+	for (size_t i = this->arraySize; i < size; i++)
+	{
+		newArray[i] = (otherArray)[i-this->arraySize];
+	}
+	return newArray;
+}
+
+Table Table::operator+(Table &table) {
+	int size = this->arraySize + table.arraySize;
+	Table newTable(this->name + table.name, size);
+	delete[] newTable.array;
+	newTable.array = this->concat(table.array, table.arraySize);
+	return newTable;
+}
+
+void Table::operator=(Table &table) {
+	this->name = table.name;
+	delete[] this->array;
+	this->array = copyArray(table.array, table.arraySize);
+	this->arraySize = table.arraySize;
 }
 
 int Table::getArraySize() { return this->arraySize; }

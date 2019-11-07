@@ -1,2 +1,4 @@
-﻿  ConsoleApplication9.cpp
+﻿  Table.cpp
+c:\users\karol\source\repos\consoleapplication9\consoleapplication9\table.cpp(81): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication9\consoleapplication9\table.cpp(85): warning C4018: '<': signed/unsigned mismatch
   ConsoleApplication9.vcxproj -> C:\Users\Karol\source\repos\ConsoleApplication9\Debug\ConsoleApplication9.exe
