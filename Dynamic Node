@@ -1,0 +1,33 @@
+#pragma once
+
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class DynamicTree {
+public:
+	DynamicTree();
+	~DynamicTree();
+	DynamicNode* getRoot() { return &root; };
+	void printTree();
+private:
+	DynamicNode root;
+};
+
+class DynamicNode {
+public:
+	DynamicNode() { int value = 0; parent = NULL; }
+	~DynamicNode();
+	void setValue(int value) { this->value = value; }
+	int getNumberOfChildren() { return children.size(); }
+	void addNewChild();
+	DynamicNode* getChildOfNumber(int offset);
+	void  print() { cout << " " << value; };
+	void printAllBelow();
+	void printAllUp();
+private:
+	vector<DynamicNode*> children;
+	DynamicNode *parent;
+	int value;
+};
