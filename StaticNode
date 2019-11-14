@@ -1,0 +1,35 @@
+#pragma once
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class StaticTree {
+public:
+	StaticTree();
+	~StaticTree();
+	StaticNode* getRoot() { return &root; };
+	void printTree();
+private:
+	StaticNode root;
+};
+
+
+class StaticNode {
+public:
+	StaticNode() { int value = 0; parent = NULL; }
+	~StaticNode();
+	void setValue(int value) { this->value = value; }
+	int getNumberOfChildren() { return children.size(); }
+	void addNewChild();
+	StaticNode* getChildOfNumber(int offset);
+	void  print() { cout << " " << value; };
+	void printAllBelow();
+	void printAllUp();
+private:
+	vector<StaticNode> children;
+	StaticNode *parent;
+	int value;
+};
+
+
