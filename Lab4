@@ -1,0 +1,66 @@
+
+
+#include "pch.h"
+#include <iostream>
+#include "Error.h"
+
+const int Times = 10;
+
+bool FileLastError::lastError;
+
+vector<string> initVector(string text) {
+	vector<string> vec;
+	for (size_t i = 0; i < Times; i++)
+	{
+		vec.push_back(text);
+	}
+	return vec;
+}
+
+bool printNTimestLastError(string fileName,string text) {
+	FileLastError error;
+	error.openFile(fileName);
+	if (error.getLastError()) return false;
+	vector<string> vec = initVector(text);
+	error.printManyLines(vec);
+	if (error.getLastError()) return false;
+	error.closeFile();
+	if (error.getLastError()) return false;
+	return true;
+}
+
+void printNTimesException(string fileName, string text) {
+	FileThrowEx error;
+	try {
+		error.openFile(fileName);
+		vector<string> vec = initVector(text);
+		error.printManyLines(vec);
+		error.closeFile();
+	}
+	catch(int e){
+		throw e;
+	}
+}
+
+bool printNTimesErrorCode(string fileName, string text) {
+	FileErrCode error;
+	vector<string> vec = initVector(text);
+	return (error.openFile(fileName) && error.printManyLines(vec) && error.closeFile());
+}
+
+int main()
+{
+	string fileName = "C:/Users/Karol/Desktop/cpp";
+	string text = "java>c++";
+	bool code = printNTimesErrorCode(fileName,"C");
+	bool last = printNTimestLastError(fileName, "B");
+	bool exception = false;
+	try {
+		printNTimesException(fileName, "A");
+		exception = true;
+	}
+	catch (int e) {
+		exception = false;
+	}
+	cout << code << last << exception;
+}
