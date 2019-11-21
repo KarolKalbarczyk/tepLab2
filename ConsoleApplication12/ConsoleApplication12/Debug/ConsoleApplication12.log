@@ -1,0 +1,7 @@
+﻿  DynamicNode.cpp
+c:\users\karol\source\repos\consoleapplication12\consoleapplication12\dynamicnode.cpp(11): warning C4018: '>': signed/unsigned mismatch
+  StaticNode.cpp
+c:\users\karol\source\repos\consoleapplication12\consoleapplication12\staticnode.cpp(22): warning C4018: '>': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication12\consoleapplication12\staticnode.cpp(52): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  ConsoleApplication12.vcxproj -> C:\Users\Karol\source\repos\ConsoleApplication12\Debug\ConsoleApplication12.exe
