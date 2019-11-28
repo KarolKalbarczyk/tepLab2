@@ -1,0 +1,20 @@
+﻿  ConsoleApplication13.cpp
+c:\users\karol\source\repos\consoleapplication13\consoleapplication13\dynamictree.h(56): warning C4018: '>': signed/unsigned mismatch
+  c:\users\karol\source\repos\consoleapplication13\consoleapplication13\dynamictree.h(55): note: while compiling class template member function 'DynamicNode<T> *DynamicNode<T>::getChildOfNumber(int)'
+          with
+          [
+              T=std::string
+          ]
+  c:\users\karol\source\repos\consoleapplication13\consoleapplication13\consoleapplication13.cpp(14): note: see reference to function template instantiation 'DynamicNode<T> *DynamicNode<T>::getChildOfNumber(int)' being compiled
+          with
+          [
+              T=std::string
+          ]
+  c:\users\karol\source\repos\consoleapplication13\consoleapplication13\consoleapplication13.cpp(11): note: see reference to class template instantiation 'DynamicNode<T>' being compiled
+          with
+          [
+              T=std::string
+          ]
+  DynamicTree.h
+  Generating Code...
+  ConsoleApplication13.vcxproj -> C:\Users\Karol\source\repos\ConsoleApplication13\Debug\ConsoleApplication13.exe
