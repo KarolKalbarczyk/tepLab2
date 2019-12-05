@@ -1,0 +1,3 @@
+﻿  ConsoleApplication14.cpp
+c:\users\karol\source\repos\consoleapplication14\consoleapplication14\consoleapplication14.cpp(27): warning C4101: 'aaa': unreferenced local variable
+  ConsoleApplication14.vcxproj -> C:\Users\Karol\source\repos\ConsoleApplication14\Debug\ConsoleApplication14.exe
