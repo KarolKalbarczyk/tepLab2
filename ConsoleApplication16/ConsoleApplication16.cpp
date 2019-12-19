@@ -7,7 +7,7 @@
 #include "MscnProblem.h"
 #include "FileManager.h"
 
-double sumHorizontal(Matrix** array, int matrixNumber, int indexX) {
+/*double sumHorizontal(Matrix** array, int matrixNumber, int indexX) {
 	//if (matrixNumber < 0 || matrixNumber >= NUMBER_OF_MATRICES) return 0;
 	double sum = 0;
 	Matrix* matrix = (array[matrixNumber]);
@@ -19,13 +19,12 @@ double sumHorizontal(Matrix** array, int matrixNumber, int indexX) {
 	return sum;
 }
 
-
+*/
 
 int main()
 {
 
-	FILE * file = fopen("C:/Users/Karol/Desktop/Notariusz.txt", "rb");
-	FileManager manager;
+	ProblemFileIOManager manager;
 	/*char bufor[1];
 	int u = fgetc(file);
 	bufor[0] = (char)u;
@@ -40,10 +39,15 @@ int main()
 	u = fgetc(file);
 	bufor[0] = (char)u;
 	std::cout << bufor[0];*/
-	MscnProblem* prob = manager.loadFromFile("C:/Users/Karol/Desktop/Notariusz.txt");
+	MscnProblem* prob = manager.loadFromFile("C:/Users/Karol/Desktop/cpp.txt");
 	std::cout << prob->calcIncome();
 	std::cout << prob->checkConstraints();
-	manager.saveToFile("C:/Users/Karol/Desktop/cpp.txt", prob);
+	double arr[] = { 1,1,-2 };
+	Response<double> resp = prob->getQuality(arr,3);
+	cout << resp.getSuccess();
+	cout << *(resp.getValue());
+	manager.saveToFile("C:/Users/Karol/Desktop/Notariusz.txt", prob);
+	delete prob;
 	/*prob.changeSizeOF(Shop, 1);
 	prob.changeSizeOF(Supplier, 1);
 	prob.changeSizeOF(Fabric, 1);

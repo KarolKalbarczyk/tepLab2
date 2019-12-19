@@ -19,12 +19,12 @@ Matrix::Matrix(int name) {
 	sizeY = 0;
 }
 
-double Matrix::getAt(int indexX, int indexY,bool* success = NULL) {
+double Matrix::getAt(int indexX, int indexY,bool* success) {
 	if (outOfBounds(indexX, indexY)) {
 		if (success != NULL) *success = false;
 		return 0;
 	}
-	return (*matrix)[indexX][indexY];
+	return matrix[indexX][indexY];
 }
 
 bool Matrix::outOfBounds(int indexX, int indexY) {
@@ -33,14 +33,12 @@ bool Matrix::outOfBounds(int indexX, int indexY) {
 	return false;
 }
 
-
 void Matrix::deleteMatrix() {
 	for (size_t i = 0; i < sizeX; i++)
 	{
-		delete[](*matrix)[i];
+		delete[] matrix[i];
 	}
-	delete[] (*matrix);
-	delete matrix;
+    if((matrix) !=NULL)	delete[] matrix;
 }
 
 bool Matrix::setMatrix(double ***matrix, int sizeX, int sizeY) {
@@ -48,7 +46,7 @@ bool Matrix::setMatrix(double ***matrix, int sizeX, int sizeY) {
 	if (sizeX == 0) sizeX = 1;
 	if (sizeY == 0) sizeY = 1;
 	deleteMatrix();
-	this->matrix = matrix;
+	this->matrix = (*matrix);
 	this->sizeX = sizeX;
 	this->sizeY = sizeY;
 	return true;
@@ -58,24 +56,23 @@ bool Matrix::changeSize(int sizeX, int sizeY) {
 	if (sizeX < 0 || sizeY < 0) return false;
 	if (sizeX == 0) sizeX = 1;
 	if (sizeY == 0) sizeY = 1;
-	double *** newArray= new double**;
-	(*newArray) = new double*[sizeX];
+	double ** newArray= new double*[sizeX];
 	for (size_t i = 0; i < sizeX; i++)
 	{
-		(*newArray)[i] = new double[sizeY];
+		newArray[i] = new double[sizeY];
 	}
-	return setMatrix(newArray, sizeX, sizeY);
+	return setMatrix(&newArray, sizeX, sizeY);
 }
 
 bool Matrix::setAt(double value, int indexX, int indexY) {
 	if (outOfBounds(indexX,indexY) || value < 0) return false;
-	(*matrix)[indexX][indexY] = value;
+	matrix[indexX][indexY] = value;
 	return true;
 }
 
 
 
-int MscnProblem::getNumberOf(Objects object) {
+int MscnProblem::getNumberOf(Subjects object) {
 	if (object == Shop) {
 		return tables[SS]->getArraySize();
 	}
@@ -88,27 +85,36 @@ int MscnProblem::getNumberOf(Objects object) {
 	if (object == Supplier) {
 		return tables[SD]->getArraySize();
 	}
+	return -1;
 }
 
-bool MscnProblem::changeSizeOF(Objects object, int newSize) {
+bool MscnProblem::changeSizeOF(Subjects object, int newSize) {
 	if (newSize <= 0) return false;
 	if (object == Shop) {
 		matrices[CM]->changeSize(matrices[CM]->getsizeX(), newSize);
 		matrices[XM]->changeSize(matrices[XM]->getsizeX(), newSize);
+		matrices[XMMIN]->changeSize(matrices[XM]->getsizeX(), newSize);
+		matrices[XMMAX]->changeSize(matrices[XM]->getsizeX(), newSize);
 		tables[SS]->setNewArraySize(newSize);
 		tables[PS]->setNewArraySize(newSize);
 	}
 	if (object == Warehouse) {
 		return changeSizeOF(CF, CM, SM,newSize) &&
-		changeSizeOF(XF, XM, UM,newSize);
+		  changeSizeOF(XF, XM, UM,newSize) &&
+		  changeSizeOF(XFMIN,XMMIN,newSize) &&
+		  changeSizeOF(XFMAX, XMMAX, newSize);
 	}
 	if (object == Fabric) {
 		return changeSizeOF(CD, CF, SF, newSize) &&
-		changeSizeOF(XD, XF, UF, newSize);
+		  changeSizeOF(XD, XF, UF, newSize) &&
+		  changeSizeOF(XDMIN, XFMIN, newSize) &&
+		  changeSizeOF(XDMAX, XFMAX, newSize);
 	}
 	if (object == Supplier) {
 		matrices[CD]->changeSize(newSize, matrices[CD]->getsizeY());
 		matrices[XD]->changeSize(newSize, matrices[XD]->getsizeY());
+		matrices[XDMIN]->changeSize(newSize, matrices[XD]->getsizeY());
+		matrices[XDMAX]->changeSize(newSize, matrices[XD]->getsizeY());
 		tables[SD]->setNewArraySize(newSize);
 		tables[UD]->setNewArraySize(newSize);
 	}
@@ -121,17 +127,24 @@ double MscnProblem::calcKT() {
 
 bool MscnProblem::changeSizeOF(Matrices matrix1, Matrices matrix2, Tables table, int newSize) {
 	return matrices[matrix1]->changeSize(matrices[matrix1]->getsizeX(), newSize) &&
-	matrices[matrix2]->changeSize(newSize, matrices[matrix2]->getsizeY()) &&
-	tables[table]->setNewArraySize(newSize);
+	  matrices[matrix2]->changeSize(newSize, matrices[matrix2]->getsizeY()) &&
+	  tables[table]->setNewArraySize(newSize);
+}
+
+bool MscnProblem::changeSizeOF(Matrices matrix1, Matrices matrix2, int newSize) {
+	return matrices[matrix1]->changeSize(matrices[matrix1]->getsizeX(), newSize) &&
+		matrices[matrix2]->changeSize(newSize, matrices[matrix2]->getsizeY());
 }
 
 bool MscnProblem::setAtMatrix(Matrices matrixNumber, double value, int indexX, int indexY) {
 	if (matrixNumber < 0 || matrixNumber >= NUMBER_OF_MATRICES) return false;
+	if (value < 0) return false;
 	return matrices[matrixNumber]->setAt(value, indexX, indexY);
 }
 
 bool MscnProblem::setAtTable(Tables tableNumber, double value, int index) {
 	if (tableNumber < 0 || tableNumber>= NUMBER_OF_TABLES) return false;
+	if (value < 0) return false;
 	return tables[tableNumber]->setAt(value, index);
 }
 
@@ -185,39 +198,38 @@ double MscnProblem::calcKU() {
 	return sum(XD, UD) + sum(XF, UF) + sum(XM, UM);
 }
 
-Response<double>* MscnProblem::getQuality(double* solution,int size) {
-	if (!arrayToXMatrices(solution, size)) return new Response<double>(0, false);
-	else return new Response<double>(calcIncome(),true);
+Response<double> MscnProblem::getQuality(double* solution,int size) {
+	if (!arrayToXMatrices(solution, size)) return std::move(Response<double>(0.0, false));
+	else return std::move(Response<double>(calcIncome(),true));
 }
 
-Response<bool>* MscnProblem::constaintSatisfied(double* solution, int size) {
-	if (!arrayToXMatrices(solution, size)) return new Response<bool>(false, false);
-	else return new Response<bool>(checkConstraints(), true);
+Response<bool> MscnProblem::constaintSatisfied(double* solution, int size) {
+	if (!arrayToXMatrices(solution, size)) return std::move(Response<bool>(false, false));
+	else return std::move(Response<bool>(checkConstraints(), true));
 }
 
-Response<pair<double, double>>* MscnProblem::checkConstraintAt(Matrices matrixNumber, int indexX, int indexY) {
+Response<pair<double, double>> MscnProblem::checkConstraintAt(Matrices matrixNumber, int indexX, int indexY) {
 	if (matrixNumber == XD) {
-		return doubleGetAt(XDMIN, XDMAX);
+		return std::move(doubleGetAt(XDMIN, XDMAX,indexX,indexY));
 	}if (matrixNumber == XF) {
-		return doubleGetAt(XFMIN, XFMAX);
+		return std::move(doubleGetAt(XFMIN, XFMAX, indexX, indexY));
 	}if (matrixNumber == XM) {
-		return doubleGetAt(XMMIN, XMMAX);
+		return std::move(doubleGetAt(XMMIN, XMMAX, indexX, indexY));
 	}
-	return new Response< pair<double, double>>(pair<double, double>(0, 0), false)
+	return std::move( Response< pair<double, double>>(pair<double, double>(0, 0), false));
 }
 
-Response<pair<double, double>>* MscnProblem::doubleGetAt(Matrices minMatrix, Matrices maxMatrix, int indexX, int indexY) {
+Response<pair<double, double>> MscnProblem::doubleGetAt(Matrices minMatrix, Matrices maxMatrix, int indexX, int indexY) {
 	Matrix* matrix1 = matrices[minMatrix];
 	Matrix* matrix2 = matrices[maxMatrix];
 	if (!matrix1->outOfBounds(indexX, indexY) &&
 		!matrix2->outOfBounds(indexX, indexY) ) {
 		double min = matrix1->getAt(indexX, indexY);
 		double max = matrix1->getAt(indexX, indexY);
-		return new Response< pair<double, double>>(pair<double, double>(min,max), true);
+		return std::move(Response< pair<double, double>>(pair<double, double>(min,max), true));
 	}
-	else return new Response< pair<double, double>>(pair<double, double>(0, 0), false);
+	else return std::move(Response< pair<double, double>>(pair<double, double>(0, 0), false));
 }
-
 
 double MscnProblem::calcP() {
 	double sum = 0;
@@ -294,8 +306,8 @@ bool MscnProblem::arrayToXMatrices(double *array, int size) {
 	if (array == NULL) return false;
 	if (size != matrices[XD]->getSize() + matrices[XF]->getSize() + matrices[XM]->getSize()) return false;
 	return arrayToSingleXMatrix(array, 0, XD) &&
-		arrayToSingleXMatrix(array, matrices[XD]->getSize(), XF)
-		&& (array, matrices[XD]->getSize() + matrices[XF]->getSize(), XM);
+		arrayToSingleXMatrix(array, matrices[XD]->getSize(), XF) &&
+		arrayToSingleXMatrix(array, matrices[XD]->getSize() + matrices[XF]->getSize(), XM);
 }
 
 bool MscnProblem::arrayToSingleXMatrix(double *array,int startIndex,Matrices matrixNumber) {
@@ -309,6 +321,7 @@ bool MscnProblem::arrayToSingleXMatrix(double *array,int startIndex,Matrices mat
 			check = check && matrix->setAt(array[startIndex++], i, j);
 		}
 	}
+	return check;
 }
 
 int MscnProblem::epsilonFunc(double value) {
@@ -316,3 +329,15 @@ int MscnProblem::epsilonFunc(double value) {
 	else return 0;
 }
 
+MscnProblem::~MscnProblem() {
+	for (size_t i = 0; i < NUMBER_OF_MATRICES; i++)
+	{
+		delete matrices[i];
+	}
+	for (size_t i = 0; i < NUMBER_OF_TABLES; i++)
+	{
+		delete tables[i];
+	}
+	delete[] matrices;
+	delete[] tables;
+}
