@@ -18,7 +18,8 @@ double* RandomSearch::solveProblem(Problem* problem) {
 		if(result != NULL) delete[] result;
 		result = iteration(problem,constraints);
 	} while (!problem->checkConstraints());
-    return result;
+	delete[] constraints;
+        return result;
 }
 
 double* RandomSearch::iteration(Problem* problem, std::pair<double, double>* constraints) {
