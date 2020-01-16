@@ -1,14 +1,13 @@
 
 
 #include "pch.h"
-//#include "MscnProblem.h"
 #include "FileManager.h"
 #include "MySmartPointer.h"
 #include <vector>
 #include <string>
 
 using namespace std;
-
+/*
 
 bool Format::hasNext() {
 	return index < order.size();
@@ -23,7 +22,7 @@ int Format::next() {
 	return abs((order.at(index++)))-1;
 }
 
-vector<int>* ProblemFileIOManager::nextLine(bool *endOfFile) {
+vector<int>* MscnProblem::nextLine(bool *endOfFile) {
 	std::vector<int> *vec = new vector<int>();
 	int chr = 0;
 	while (chr != rCode && chr != EOF) {
@@ -37,7 +36,7 @@ vector<int>* ProblemFileIOManager::nextLine(bool *endOfFile) {
 	return vec;
 }
 
-vector<string>* ProblemFileIOManager::transformLineToStrings(vector<int>* line) {
+vector<string>* MscnProblem::transformLineToStrings(vector<int>* line) {
 	std::vector<char> buffer;
 	std::vector<string>* vec = new vector<string>;
 	int chr = 0;
@@ -55,7 +54,7 @@ vector<string>* ProblemFileIOManager::transformLineToStrings(vector<int>* line) 
 	return vec;
 }
 
-vector<double>* ProblemFileIOManager::stringsToDoubles(vector<string>* strings) {
+vector<double>* MscnProblem::stringsToDoubles(vector<string>* strings) {
 	std::vector<double>* vec = new vector<double>;
 	for (size_t i = 0; i < strings->size(); i++)
 	{
@@ -68,7 +67,7 @@ vector<double>* ProblemFileIOManager::stringsToDoubles(vector<string>* strings) 
 	return vec;
 }
 
-vector<double>* ProblemFileIOManager::lineToDoubles(bool *endOfFile) {
+vector<double>* MscnProblem::lineToDoubles(bool *endOfFile) {
 	vector<double>* doubles = nullptr;
 	do {
 		delete doubles;
@@ -82,7 +81,7 @@ vector<double>* ProblemFileIOManager::lineToDoubles(bool *endOfFile) {
 	return doubles;
 }
 
-bool ProblemFileIOManager::lineToMatrix(Matrices matrixNumber, vector<double>* values, Matrix*** matrices) {
+bool MscnProblem::lineToMatrix(Matrices matrixNumber, vector<double>* values, Matrix*** matrices) {
 	Matrix* matrix = (*matrices)[matrixNumber];
 	if (values->size() != matrix->getSize()) return false;
 	for (size_t i = 0; i < matrix->getsizeX(); i++)
@@ -98,7 +97,7 @@ bool ProblemFileIOManager::lineToMatrix(Matrices matrixNumber, vector<double>* v
 	return true;
 }
 
-bool ProblemFileIOManager::lineToTable(Tables tableNumber, vector<double>* values, Table*** tables) {
+bool MscnProblem::lineToTable(Tables tableNumber, vector<double>* values, Table*** tables) {
 	Table* table = (*tables)[tableNumber];
 	if (values->size() != table->getArraySize()) return false;
 	for (size_t j = 0; j < table->getArraySize(); j++)
@@ -111,7 +110,7 @@ bool ProblemFileIOManager::lineToTable(Tables tableNumber, vector<double>* value
 	return true;
 }
 
-bool ProblemFileIOManager::setValuesFromFile(MscnProblem* problem) {
+bool MscnProblem::setValuesFromFile(MscnProblem* problem) {
 	MySmartPointer<vector<double>> vec(NULL);
 	vector<Subjects> obj{ Supplier,Fabric,Warehouse,Shop };
 	bool endOfFile = false;
@@ -134,11 +133,11 @@ bool ProblemFileIOManager::setValuesFromFile(MscnProblem* problem) {
 	/*linesToTables(tab, problem);
 	linesToMatrices(mat, problem);
 	linesToTables(tab2, problem);
-	linesToMatrices(mat2,problem);*/
+	linesToMatrices(mat2,problem);
 	return true;
 }
 
-bool ProblemFileIOManager::linesToMatrices(vector<Matrices> matrices, MscnProblem* problem) {
+bool MscnProblem::linesToMatrices(vector<Matrices> matrices, MscnProblem* problem) {
 	MySmartPointer<vector<double>> vec(NULL);
 	bool endOfFile = false;
 	for (size_t i = 0; i < matrices.size(); i++)
@@ -150,7 +149,7 @@ bool ProblemFileIOManager::linesToMatrices(vector<Matrices> matrices, MscnProble
 	return true;
 }
 
-bool ProblemFileIOManager::linesToTables(vector<Tables> tables, MscnProblem* problem) {
+bool MscnProblem::linesToTables(vector<Tables> tables, MscnProblem* problem) {
 	MySmartPointer<vector<double>> vec(NULL);
 	bool endOfFile = false;
 	for (size_t i = 0; i < tables.size(); i++)
@@ -162,7 +161,7 @@ bool ProblemFileIOManager::linesToTables(vector<Tables> tables, MscnProblem* pro
 	return true;
 }
 
-MscnProblem* ProblemFileIOManager::loadFromFile(string filePath) {
+MscnProblem* MscnProblem::loadFromFile(string filePath) {
 	file = fopen(filePath.c_str(), READ_OPTION.c_str());
 	MscnProblem* problem = new MscnProblem();
 	if (file == NULL) return NULL;
@@ -171,7 +170,7 @@ MscnProblem* ProblemFileIOManager::loadFromFile(string filePath) {
 	return problem;
 }
 
-bool ProblemFileIOManager::saveToFile(string filePath, MscnProblem* problem) {
+bool MscnProblem::saveToFile(string filePath, MscnProblem* problem) {
 	file = fopen(filePath.c_str(), WRITE_OPTION.c_str());
 	if (file == NULL) return false;
 	if (!setValuesToFile(problem)) return false;
@@ -179,12 +178,12 @@ bool ProblemFileIOManager::saveToFile(string filePath, MscnProblem* problem) {
 	return true;
 }
 
-bool ProblemFileIOManager::printQuantity(Subjects object,MscnProblem* problem, vector<string> objectNames){
+bool MscnProblem::printQuantity(Subjects object,MscnProblem* problem, vector<string> objectNames){
 	fprintf(file, (objectNames[object] + SPACE + std::to_string(problem->getNumberOf(object)) + NEW_LINE ).c_str());
 	return true;
 }
 
-bool ProblemFileIOManager::printMatrixToFile(Matrices matrixNumber,Matrix*** matrices) {
+bool MscnProblem::printMatrixToFile(Matrices matrixNumber,Matrix*** matrices) {
 	Matrix* matrix = (*matrices)[matrixNumber];
 	fprintf(file, (matNames[matrixNumber] + NEW_LINE).c_str());
 	for (size_t i = 0; i < matrix->getsizeX(); i++)
@@ -198,7 +197,7 @@ bool ProblemFileIOManager::printMatrixToFile(Matrices matrixNumber,Matrix*** mat
 	return true;
 }
 
-bool ProblemFileIOManager::printTableToFile(Tables tableNumber, Table*** tables) {
+bool MscnProblem::printTableToFile(Tables tableNumber, Table*** tables) {
 	Table* table = (*tables)[tableNumber];
 	fprintf(file, (tabNames[tableNumber] + NEW_LINE).c_str());
 	for (size_t i = 0; i < table->getArraySize(); i++)
@@ -209,7 +208,7 @@ bool ProblemFileIOManager::printTableToFile(Tables tableNumber, Table*** tables)
 	return true;
 }
 
-bool ProblemFileIOManager::setValuesToFile(MscnProblem* problem) {
+bool MscnProblem::setValuesToFile(MscnProblem* problem) {
 	vector<Subjects> obj{ Supplier,Fabric,Warehouse,Shop };
 	for (size_t i = 0; i < obj.size(); i++)
 	{
@@ -223,11 +222,11 @@ bool ProblemFileIOManager::setValuesToFile(MscnProblem* problem) {
 	/*printTablesToFile(tab, problem, tabNames);
 	printMatricesToFile(mat, problem, matNames);
 	printTablesToFile(tab2, problem, tabNames);
-	printMatricesToFile(mat2, problem, matNames);*/
+	printMatricesToFile(mat2, problem, matNames);
 	return true;
 }
 
-bool ProblemFileIOManager::printMatricesToFile(vector<Matrices> mat, MscnProblem* problem, vector<string> names){
+bool MscnProblem::printMatricesToFile(vector<Matrices> mat, MscnProblem* problem, vector<string> names){
 	for (size_t i = 0; i < mat.size(); i++)
 	{
 		printMatrixToFile(mat.at(i), problem->getMatrices());
@@ -236,10 +235,10 @@ bool ProblemFileIOManager::printMatricesToFile(vector<Matrices> mat, MscnProblem
 }
 	
 
-bool ProblemFileIOManager::printTablesToFile(vector<Tables> mat, MscnProblem* problem, vector<string> names){
+bool MscnProblem::printTablesToFile(vector<Tables> mat, MscnProblem* problem, vector<string> names){
 	for (size_t i = 0; i < mat.size(); i++)
 	{
 		printTableToFile(mat.at(i), problem->getTables());
 	}
 	return true;
-}
+}*/

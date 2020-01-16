@@ -1,2 +1,34 @@
-﻿  ConsoleApplication16.cpp
+﻿  MscnProblem.cpp
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(17): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(26): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(59): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(82): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(192): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(194): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(207): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(210): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(263): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(265): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(292): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(304): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(322): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(324): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(377): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(379): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(390): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(407): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(409): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(422): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(474): warning C4101: 'ia': unreferenced local variable
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(496): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(498): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(512): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(530): warning C4244: 'argument': conversion from '_Ty' to 'int', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(595): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(597): warning C4018: '<': signed/unsigned mismatch
+c:\users\karol\source\repos\consoleapplication16\consoleapplication16\mscnproblem.cpp(609): warning C4018: '<': signed/unsigned mismatch
   ConsoleApplication16.vcxproj -> C:\Users\Karol\source\repos\ConsoleApplication16\Debug\ConsoleApplication16.exe

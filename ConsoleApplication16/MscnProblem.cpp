@@ -9,6 +9,28 @@
 
 using namespace std;
 
+
+
+
+double sumHorizontal(Matrix* matrix, int indexX) {
+	double sum = 0;
+	for (size_t j = 0; j < matrix->getsizeY(); j++)
+	{
+		sum += matrix->getAt(indexX, j);
+	}
+	return sum;
+}
+
+double sumVertical(Matrix* matrix, int indexY) {
+	double sum = 0;
+	for (size_t j = 0; j < matrix->getsizeX(); j++)
+	{
+		sum += matrix->getAt(j, indexY);
+	}
+	return sum;
+}
+
+
 Matrix::~Matrix() {
 	deleteMatrix();
 }
@@ -149,6 +171,7 @@ bool MscnProblem::setAtTable(Tables tableNumber, double value, int index) {
 }
 
 MscnProblem::MscnProblem() {
+	fitnessCount = 0;
 	matrices = new Matrix*[NUMBER_OF_MATRICES];
 	for (size_t i = 0; i < NUMBER_OF_MATRICES; i++)
 	{
@@ -198,37 +221,40 @@ double MscnProblem::calcKU() {
 	return sum(XD, UD) + sum(XF, UF) + sum(XM, UM);
 }
 
-Response<double> MscnProblem::getQuality(double* solution,int size) {
-	if (!arrayToXMatrices(solution, size)) return std::move(Response<double>(0.0, false));
-	else return std::move(Response<double>(calcIncome(),true));
+double MscnProblem::getQuality(double* solution,int size,bool* success) {
+	if (!arrayToXMatrices(solution, size)) { success = false; return 0.0; }
+	fitnessCount++;
+	return calcIncome();
 }
 
-Response<bool> MscnProblem::constaintSatisfied(double* solution, int size) {
-	if (!arrayToXMatrices(solution, size)) return std::move(Response<bool>(false, false));
-	else return std::move(Response<bool>(checkConstraints(), true));
+bool MscnProblem::constaintSatisfied(double* solution, int size,bool* success) {
+	if (!arrayToXMatrices(solution, size)) { *success = false; return false; }
+	return checkConstraints();
 }
 
-Response<pair<double, double>> MscnProblem::checkConstraintAt(Matrices matrixNumber, int indexX, int indexY) {
+pair<double, double> MscnProblem::checkConstraintAt(Matrices matrixNumber, int indexX, int indexY,bool* success) {
 	if (matrixNumber == XD) {
-		return std::move(doubleGetAt(XDMIN, XDMAX,indexX,indexY));
+		return doubleGetAt(XDMIN, XDMAX,indexX,indexY,success);
 	}if (matrixNumber == XF) {
-		return std::move(doubleGetAt(XFMIN, XFMAX, indexX, indexY));
+		return doubleGetAt(XFMIN, XFMAX, indexX, indexY, success);
 	}if (matrixNumber == XM) {
-		return std::move(doubleGetAt(XMMIN, XMMAX, indexX, indexY));
+		return doubleGetAt(XMMIN, XMMAX, indexX, indexY, success);
 	}
-	return std::move( Response< pair<double, double>>(pair<double, double>(0, 0), false));
+	if(success != NULL) *success = false;
+	return pair<double, double>(0, 0);
 }
 
-Response<pair<double, double>> MscnProblem::doubleGetAt(Matrices minMatrix, Matrices maxMatrix, int indexX, int indexY) {
+pair<double, double> MscnProblem::doubleGetAt(Matrices minMatrix, Matrices maxMatrix, int indexX, int indexY,bool* success) {
 	Matrix* matrix1 = matrices[minMatrix];
 	Matrix* matrix2 = matrices[maxMatrix];
 	if (!matrix1->outOfBounds(indexX, indexY) &&
 		!matrix2->outOfBounds(indexX, indexY) ) {
 		double min = matrix1->getAt(indexX, indexY);
-		double max = matrix1->getAt(indexX, indexY);
-		return std::move(Response< pair<double, double>>(pair<double, double>(min,max), true));
+		double max = matrix2->getAt(indexX, indexY);
+		return pair<double, double>(min,max);
 	}
-	else return std::move(Response< pair<double, double>>(pair<double, double>(0, 0), false));
+	if (success != NULL) *success = false;
+	return pair<double, double>(0, 0);
 }
 
 double MscnProblem::calcP() {
@@ -250,34 +276,16 @@ double MscnProblem::calcIncome() {
 	return calcP() - calcKT() - calcKU();
 }
 
-double sumHorizontal(Matrix* matrix, int indexX){
-	double sum = 0;
-	for (size_t j = 0; j < matrix->getsizeY(); j++)
-	{
-		sum += matrix->getAt(indexX, j);
-	}
-	return sum;
-}
-
-double sumVertical(Matrix* matrix, int indexY) {
-	double sum = 0;
-	for (size_t j = 0; j < matrix->getsizeX(); j++)
-	{
-		sum += matrix->getAt(j, indexY);
-	}
-	return sum;
-}
-
 bool MscnProblem::checkConstraints() {
-	return checkConstraint(&sumHorizontal,XD, SD,true) 
-		&& checkConstraint(&sumHorizontal,XF, SF,true)
-		&& checkConstraint(&sumHorizontal,XM, SM,true) 
-		&& checkConstraint(&sumVertical,XM,SS,false)
+	return checkSingleConstraint(&sumHorizontal,XD, SD,true) 
+		&& checkSingleConstraint(&sumHorizontal,XF, SF,true)
+		&& checkSingleConstraint(&sumHorizontal,XM, SM,true) 
+		&& checkSingleConstraint(&sumVertical,XM,SS,false)
 		&& checkConstraintMatrices(XD, XF)
 		&& checkConstraintMatrices(XF, XM);
 }
 
-bool MscnProblem::checkConstraint(double (*sumFunction)(Matrix* matrix,int index),
+bool MscnProblem::checkSingleConstraint(double (*sumFunction)(Matrix* matrix,int index),
 	Matrices matrixNumber, Tables tableNumber, bool horizontal) {
 	bool check = true;
 	Matrix* matrix = matrices[matrixNumber];
@@ -317,7 +325,7 @@ bool MscnProblem::arrayToSingleXMatrix(double *array,int startIndex,Matrices mat
 	{
 		for (size_t j = 0; j < matrix->getsizeY(); j++)
 		{
-			if (array[startIndex] <= 0) return false;
+			if (array[startIndex] < 0) return false;
 			check = check && matrix->setAt(array[startIndex++], i, j);
 		}
 	}
@@ -340,4 +348,301 @@ MscnProblem::~MscnProblem() {
 	}
 	delete[] matrices;
 	delete[] tables;
+}
+
+void MscnProblem::generateInstance(int seed){
+	rand.setSeed(seed);
+	vector<Matrices> vec{ CD,CF,CM};
+	vector<Matrices> vecMin{ XDMIN,XFMIN,XMMIN};
+	vector<Matrices> vecMax{ XDMAX,XFMAX,XMMAX};
+	vector<Tables> vec2{ UD,UF,UM,SD,SM,SF,SS,PS};
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		fillMatrix(vec.at(i),CMatrices);
+	}
+	for (size_t i = 0; i < vec2.size(); i++)
+	{
+		fillTable(vec2.at(i));
+	}
+	for (size_t i = 0; i < vecMin.size(); i++)
+	{
+		fillMatrix(vecMin.at(i), MIN);
+	}
+	for (size_t i = 0; i < vecMax.size(); i++)
+	{
+		fillMatrix(vecMax.at(i), MAX);
+	}
+}
+
+void MscnProblem::fillMatrix(Matrices matrixNumber,MatrixToRandom type) {
+	Matrix* matrix = matrices[matrixNumber];
+	for (size_t i = 0; i < matrix->getsizeX(); i++)
+	{
+		for (size_t j = 0; j < matrix->getsizeY(); j++)
+		{
+			if(type == MIN) matrix->setAt(rand.getDoubleInRange(0, RANDOM_CONSTRAINT_MATRIX_MIN), i, j);
+			else if(type == MAX) matrix->setAt(rand.getDoubleInRange(RANDOM_CONSTRAINT_MATRIX_MIN,RANDOM_CONSTRAINT_MATRIX_MAX),i,j);
+			else matrix->setAt(rand.getDoubleInRange(0, RANDOM_CONSTRAINT_MATRIX),i,j);
+		}
+	}
+}
+
+void MscnProblem::fillTable(Tables tableNumber) {
+	Table* table = tables[tableNumber];
+	for (size_t i = 0; i < table->getArraySize(); i++)
+	{
+		table->setAt(rand.getDoubleInRange(0,RANDOM_CONSTRAINT_TABLE), i);
+	}
+}
+
+int MscnProblem::getProblemSize() {
+	return matrices[XD]->getSize() + matrices[XF]->getSize()+matrices[XM]->getSize();
+}
+
+std::pair<double, double>* MscnProblem::getConstraints() {
+	std::pair<double, double>* pairs = new pair<double, double>[getProblemSize()];
+	int index = 0;
+	vector<Matrices> vec{ XD,XF,XM };
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		Matrix* matrix = matrices[vec.at(i)];
+		for (size_t j = 0; j < matrix->getsizeX(); j++)
+		{
+			for (size_t k = 0; k < matrix->getsizeY(); k++)
+			{
+				pairs[index++] = checkConstraintAt(vec.at(i), j, k, NULL);
+			}
+		}
+	}
+	return pairs;
+}
+
+
+
+
+bool Format::hasNext() {
+	return index < order.size();
+}
+bool Format::isTableTurn() {
+	return order.at(index) < 0;
+}
+void Format::reset() {
+	index = 0;
+}
+int Format::next() {
+	return abs((order.at(index++))) - 1;
+}
+
+vector<int>* MscnProblem::nextLine(bool *endOfFile) {
+	std::vector<int> *vec = new vector<int>();
+	int chr = 0;
+	while (chr != rCode && chr != EOF) {
+		chr = fgetc(file);
+		if (chr != rCode && chr != EOF) vec->push_back(chr);
+	}
+	if (chr == EOF && vec->size() == 0) {
+		*endOfFile = true;
+	}
+	fgetc(file);
+	return vec;
+}
+
+vector<string>* MscnProblem::transformLineToStrings(vector<int>* line) {
+	std::vector<char> buffer;
+	std::vector<string>* vec = new vector<string>;
+	int chr = 0;
+	for (size_t i = 0; i < line->size(); i++)
+	{
+		if (line->at(i) != spaceCode) {
+			buffer.push_back((char)line->at(i));
+		}
+		else {
+			vec->push_back(string(buffer.begin(), buffer.end()));
+			buffer.clear();
+		}
+	}
+	vec->push_back(string(buffer.begin(), buffer.end()));
+	return vec;
+}
+
+vector<double>* MscnProblem::stringsToDoubles(vector<string>* strings) {
+	std::vector<double>* vec = new vector<double>;
+	for (size_t i = 0; i < strings->size(); i++)
+	{
+		try {
+			double val = std::stod(strings->at(i));
+			vec->push_back(val);
+		}
+		catch (const std::invalid_argument& ia) {}
+	}
+	return vec;
+}
+
+vector<double>* MscnProblem::lineToDoubles(bool *endOfFile) {
+	vector<double>* doubles = nullptr;
+	do {
+		delete doubles;
+		vector<int>* line = nextLine(endOfFile);
+		vector<string>* strings = transformLineToStrings(line);
+		doubles = stringsToDoubles(strings);
+		delete line;
+		delete strings;
+		if (*endOfFile) return NULL;
+	} while (doubles->size() == 0);
+	return doubles;
+}
+
+bool MscnProblem::lineToMatrix(Matrices matrixNumber, vector<double>* values) {
+	Matrix* matrix = matrices[matrixNumber];
+	if (values->size() != matrix->getSize()) return false;
+	for (size_t i = 0; i < matrix->getsizeX(); i++)
+	{
+		for (size_t j = 0; j < matrix->getsizeY(); j++)
+		{
+			double value = values->at(i*matrix->getsizeY() + j);
+			if (value < 0) return false;
+			bool check = matrix->setAt(values->at(i*matrix->getsizeY() + j), i, j);
+			if (!check) return false;
+		}
+	}
+	return true;
+}
+
+bool MscnProblem::lineToTable(Tables tableNumber, vector<double>* values) {
+	Table* table = tables[tableNumber];
+	if (values->size() != table->getArraySize()) return false;
+	for (size_t j = 0; j < table->getArraySize(); j++)
+	{
+		double value = values->at(j);
+		if (value <= 0) return false;
+		bool check = table->setAt(value, j);
+		if (!check) return false;
+	}
+	return true;
+}
+
+bool MscnProblem::setValuesFromFile() {
+	MySmartPointer<vector<double>> vec(NULL);
+	vector<Subjects> obj{ Supplier,Fabric,Warehouse,Shop };
+	bool endOfFile = false;
+	for (size_t i = 0; i < obj.size(); i++)
+	{
+		vec = lineToDoubles(&endOfFile);
+		if (endOfFile ||
+			!changeSizeOF(obj.at(i), vec->at(0))) return false;
+	}
+	format.reset();
+	while (format.hasNext()) {
+		vec = lineToDoubles(&endOfFile);
+		if (endOfFile) return false;
+		if (format.isTableTurn()) {
+			if (!lineToTable((Tables)format.next(), vec.getPointer()))return false;
+		}
+		else
+			if (!lineToMatrix((Matrices)format.next(), vec.getPointer())) return false;
+	}
+	return true;
+}
+
+bool MscnProblem::linesToMatrices(vector<Matrices> matrices) {
+	MySmartPointer<vector<double>> vec(NULL);
+	bool endOfFile = false;
+	for (size_t i = 0; i < matrices.size(); i++)
+	{
+		vec = lineToDoubles(&endOfFile);
+		if (endOfFile ||
+			!lineToMatrix(matrices.at(i), vec.getPointer())) return false;
+	}
+	return true;
+}
+
+bool MscnProblem::linesToTables(vector<Tables> tables) {
+	MySmartPointer<vector<double>> vec(NULL);
+	bool endOfFile = false;
+	for (size_t i = 0; i < tables.size(); i++)
+	{
+		vec = lineToDoubles(&endOfFile);
+		if (endOfFile ||
+			!lineToTable(tables.at(i), vec.getPointer())) return false;
+	}
+	return true;
+}
+
+void MscnProblem::loadFromFile(string filePath,bool* success) {
+	/*file = fopen(filePath.c_str(), READ_OPTION.c_str());
+	if (file == NULL) return;
+	if (!setValuesFromFile()) {
+		*success = false;
+		return;
+	}*/
+	fclose(file);
+}
+
+bool MscnProblem::saveToFile(string filePath) {
+	/*file = fopen(filePath.c_str(), WRITE_OPTION.c_str());
+	if (file == NULL) return false;
+	if (!setValuesToFile()) return false;
+	fclose(file);*/
+	return true;
+}
+
+bool MscnProblem::printQuantity(Subjects object, vector<string> objectNames) {
+	fprintf(file, (objectNames[object] + SPACE + std::to_string(getNumberOf(object)) + NEW_LINE).c_str());
+	return true;
+}
+
+bool MscnProblem::printMatrixToFile(Matrices matrixNumber) {
+	Matrix* matrix = matrices[matrixNumber];
+	fprintf(file, (matNames[matrixNumber] + NEW_LINE).c_str());
+	for (size_t i = 0; i < matrix->getsizeX(); i++)
+	{
+		for (size_t j = 0; j < matrix->getsizeY(); j++)
+		{
+			fprintf(file, (std::to_string(matrix->getAt(i, j)) + SPACE).c_str());
+		}
+	}
+	fprintf(file, NEW_LINE.c_str());
+	return true;
+}
+
+bool MscnProblem::printTableToFile(Tables tableNumber) {
+	Table* table = tables[tableNumber];
+	fprintf(file, (tabNames[tableNumber] + NEW_LINE).c_str());
+	for (size_t i = 0; i < table->getArraySize(); i++)
+	{
+		fprintf(file, (std::to_string(table->getAt(i)) + " ").c_str());
+	}
+	fprintf(file, NEW_LINE.c_str());
+	return true;
+}
+
+bool MscnProblem::setValuesToFile() {
+	vector<Subjects> obj{ Supplier,Fabric,Warehouse,Shop };
+	for (size_t i = 0; i < obj.size(); i++)
+	{
+		printQuantity(obj.at(i), objNames);
+	}
+	format.reset();
+	while (format.hasNext()) {
+		if (format.isTableTurn()) printTableToFile((Tables)format.next());
+		else printMatrixToFile((Matrices)format.next());
+	}
+	return true;
+}
+
+bool MscnProblem::printMatricesToFile(vector<Matrices> mat, vector<string> names) {
+	for (size_t i = 0; i < mat.size(); i++)
+	{
+		printMatrixToFile(mat.at(i));
+	}
+	return true;
+}
+
+
+bool MscnProblem::printTablesToFile(vector<Tables> mat, vector<string> names) {
+	for (size_t i = 0; i < mat.size(); i++)
+	{
+		printTableToFile(mat.at(i));
+	}
+	return true;
 }

@@ -6,6 +6,8 @@
 #include <string>
 #include "MscnProblem.h"
 #include "FileManager.h"
+#include "RandomSearch.h"
+#include "DiffEval.h"
 
 /*double sumHorizontal(Matrix** array, int matrixNumber, int indexX) {
 	//if (matrixNumber < 0 || matrixNumber >= NUMBER_OF_MATRICES) return 0;
@@ -23,8 +25,6 @@
 
 int main()
 {
-
-	ProblemFileIOManager manager;
 	/*char bufor[1];
 	int u = fgetc(file);
 	bufor[0] = (char)u;
@@ -39,65 +39,37 @@ int main()
 	u = fgetc(file);
 	bufor[0] = (char)u;
 	std::cout << bufor[0];*/
-	MscnProblem* prob = manager.loadFromFile("C:/Users/Karol/Desktop/cpp.txt");
-	std::cout << prob->calcIncome();
-	std::cout << prob->checkConstraints();
-	double arr[] = { 1,1,-2 };
-	Response<double> resp = prob->getQuality(arr,3);
-	cout << resp.getSuccess();
-	cout << *(resp.getValue());
-	manager.saveToFile("C:/Users/Karol/Desktop/Notariusz.txt", prob);
-	delete prob;
-	/*prob.changeSizeOF(Shop, 1);
-	prob.changeSizeOF(Supplier, 1);
-	prob.changeSizeOF(Fabric, 1);
-	prob.changeSizeOF(Warehouse, 1);
-	prob.setAtMatrix(CF, 4,0,0);
-	prob.setAtMatrix(CD, 3,0,0);
-	prob.setAtMatrix(CM, 1,0,0);
-	prob.setAtMatrix(XD, 1, 0, 0);
-	prob.setAtMatrix(XM, 1, 0, 0);
-	prob.setAtMatrix(XF, 1, 0, 0);
-	prob.setAtMatrix(CD, 3, 1, 0);
-	prob.setAtMatrix(CM, 1, 0, 0);
-	prob.setAtMatrix(CM, 1, 0, 1);
-	prob.setAtMatrix(XD, 4, 0, 0);
-	prob.setAtMatrix(XD, 4, 1, 0);
-	prob.setAtMatrix(XM, 3, 0, 0);
-	prob.setAtMatrix(XM, 3, 0, 1);
-	prob.setAtMatrix(XF, 1, 0, 0);
-	prob.setAtTable(UD, 10, 0);
-	prob.setAtTable(UF, 10, 0);
-	prob.setAtTable(UM, 10, 0);
-	prob.setAtTable(PS, 100, 0);
-	prob.setAtTable(SD, 100, 0);
-	prob.setAtTable(SF, 50, 0);
-	prob.setAtTable(SM, 10.5, 0);
-	prob.setAtTable(SS, 100, 0);
-	prob.setAtTable(UD, 10, 1);
-	prob.setAtTable(UF, 10, 1);
-	prob.setAtTable(UM, 10, 1);
-	prob.setAtTable(PS, 100, 1);
-	prob.setAtTable(SD, 100, 1);
-	prob.setAtTable(SF, 50, 1);
-	prob.setAtTable(SM, 10.5, 1);
-	prob.setAtTable(SS, 100, 1);
+/*
+	MscnProblem prob;
+	prob.loadFromFile("C:/Users/Karol/Desktop/cpp.txt",NULL);
 	std::cout << prob.calcIncome();
-	std::cout << prob.checkConstraints();*/
+	std::cout << prob.checkConstraints();
+	//double arr[] = { 1,1,-2 };
+	//double result = prob.getQuality(arr, 3, NULL);
+	//cout << result;
+	prob.saveToFile("C:/Users/Karol/Desktop/Notariusz.txt");
+	prob.changeSizeOF(Shop, 4);
+	prob.changeSizeOF(Warehouse, 4);
+	prob.changeSizeOF(Fabric, 3);
+	prob.changeSizeOF(Supplier, 2);
+	prob.generateInstance(217);
+	RandomSearch search(263);
+	double* solution = search.solveProblem(&prob);
+	for (size_t i = 0; i < prob.getProblemSize(); i++)
+	{
+		cout << solution[i] << " ";
+	}*/
+	MscnProblem prob;
+	DiffEval eval;
+	prob.changeSizeOF(Shop, 4);
+	prob.changeSizeOF(Warehouse, 4);
+	prob.changeSizeOF(Fabric, 3);
+	prob.changeSizeOF(Supplier, 2);
+	prob.generateInstance(98);
+	//RandomSearch search(217);
+	eval.solve(&prob,217)->printSolution();
+	
 
-
-	/*Matrix** mat = new Matrix*[1];
-	Matrix* matt = new Matrix;
-	mat[0] = matt;
-	mat[0]->changeSize(2, 3);
-	mat[0]->setAt(1, 0, 0);
-	mat[0]->setAt(2, 0, 1);
-	mat[0]->setAt(3, 0, 2);
-	mat[0]->setAt(4, 1, 0);
-	mat[0]->setAt(5, 1, 1);
-	mat[0]->setAt(6, 1, 2);
-	std::cout << sumHorizontal(mat, 0, 0);
-	std::cout << sumHorizontal(mat, 0, 0);*/
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
